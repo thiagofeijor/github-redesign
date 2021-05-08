@@ -1,0 +1,22 @@
+{
+  "name": "github-redesign",
+  "author": "thiagofeijor",
+  "scripts": {
+    "start": "poi --serve",
+    "build": "poi --prod",
+    "test": "react-scripts test"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^5.11.4",
+    "@testing-library/react": "^11.1.0",
+    "@testing-library/user-event": "^12.1.10",
+    "react-scripts": "4.0.3",
+    "poi": "^12.4.2"
+  },
+  "dependencies": {
+    "react": "^16.6.3",
+    "react-dom": "^16.6.3",
+    "react-router-dom": "^5.2.0",
+    "styled-components": "4.3.2"
+  }
+}
