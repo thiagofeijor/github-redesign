@@ -1,27 +1,20 @@
 import React from 'react'
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-} from 'react-router-dom'
+import { BrowserRouter, Switch, Route } from 'react-router-dom'
 import GlobalStyles from './styles'
-import App from './App'
+import { SearchUser, Repositories } from './scenes'
 
 export default ({}) => {
   return (
-    <Router>
+    <BrowserRouter>
       <GlobalStyles />
       <Switch>
+        <Route path="/repositories/:user_name">
+          <Repositories />
+        </Route>
         <Route path="/">
-          <App />
-        </Route>
-        <Route path="/users">
-          <p>dd</p>
-        </Route>
-        <Route path="/about">
-          <p>gg</p>
+          <SearchUser />
         </Route>
       </Switch>
-    </Router>
+    </BrowserRouter>
   )
 }
