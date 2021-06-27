@@ -1,3 +1,2 @@
-export * from './functions'
+export * from './requests'
 export * from './translate'
-export { default as requests } from './requests'

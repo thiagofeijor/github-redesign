@@ -39,6 +39,7 @@ export default ({
               const { width, render } = column
               return (
                 <Cell
+                  role="cell"
                   key={`columnrow-${iRow}-${iColumn}`}
                   width={width}
                 >

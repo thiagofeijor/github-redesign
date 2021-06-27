@@ -1,70 +1,114 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useReducer } from 'react'
 import { useParams } from 'react-router-dom'
-import { Table } from 'components'
-import requests from 'services/requests'
-import { arrayColumn } from 'services/requests'
+import debounce from 'lodash/debounce'
+import { Table, Overlay, Loading } from 'components'
+import { getRepositories } from 'services/requests'
 import { useTranslate } from 'services/translate'
+import { SelectTag } from 'scenes/components'
+import { EditRepoTag, ColumnEdit, Container } from './components'
 
 export default ({}) => {
   const { user_name } = useParams()
   const translate = useTranslate()
 
   const [isLoading, setIsLoading] = useState(true)
+  const [staredRepos, setStaredRepos] = useState([])
   const [dataTable, setDataTable] = useState([])
+  const [editing, setEditing] = useState(null)
+  const [inputValue, setInputValue] = useState('')
 
-  const loadAsyncData = data => {
-    const cachedTags = localStorage.getItem('tags')
-
-    Promise
-      .all(data.map(
-        async repo => {
-          const { name, id } = repo
-          const languages = await requests.getLanguages(user_name, name)
-          const tags = cachedTags?.[id]
-          const langs = Object.keys(languages)
-          return { ...repo, langs, tags }
-        }
-      ))
-      .then(delta => setDataTable(delta))
+  const setFilter = debounce(query => setInputValue(query), 500)
+  const fnTagReducer = (store, event) => {
+    const data = { ...store, ...event }
+    localStorage.setItem('tags', JSON.stringify(data))
+    setEditing(null)
+    return data
   }
+  const getTag = () => {
+    const tag = localStorage.getItem('tags')
+    return tag ? JSON.parse(tag) : {}
+  }
+
+  const [tag, setTag] = useReducer(fnTagReducer, getTag())
 
   useEffect(() => {
     if (!user_name) return
 
-    requests.getRepositories(user_name)
+    getRepositories(user_name)
       .then(response => {
-        setDataTable(response)
+        setStaredRepos(response)
         setIsLoading(false)
-        loadAsyncData(response)
       })
       .catch(err => {
         console.log(JSON.stringify(err))
       })
   }, [user_name])
 
+  useEffect(() => {
+    if (inputValue) {
+      const repoList = staredRepos.filter(repo => {
+        if (!tag[repo.id]) return false
+
+        return tag[repo.id]
+          .filter(t => t.includes(inputValue))
+          .length
+      })
+      setDataTable(repoList)
+      return
+    }
+    setDataTable(staredRepos)
+  }, [staredRepos, tag, inputValue])
+
   if (isLoading) {
-    return <p>loading...</p>
+    return <Loading />
   }
 
   return (
-    <Table
-      columns={[
-        { key: 'name', width: '20%', label: translate('Repositório') },
-        { key: 'description', label: translate('Descrição') },
-        { 
-          key: 'language',
-          label: translate('Linguagem'),
-          width: '10%',
-          render: ({ langs }) => (langs || []).join(', '),
-        },
-        { 
-          key: 'tags',
-          label: translate('Tags'),
-          width: '10%',
-          render: ({ tags }) => (tags || []).join(', '),
-        }
-      ]}
-      dataTable={dataTable}
-    />
+    <>
+      <Container height="10vh">
+        <SelectTag
+          tags={tag}
+          onChange={e => setFilter(e?.target?.value)}
+        />
+      </Container>
+      <Container height="90vh">
+        <Table
+          columns={[
+            { key: 'name', label: translate('Repositório') },
+            { key: 'description', label: translate('Descrição') },
+            {
+              key: 'language',
+              label: translate('Linguagem'),
+            },
+            {
+              key: 'tags',
+              label: translate('Tags'),
+              render: ({ id }) => (tag[id.toString()] || []).join(', '),
+            },
+            {
+              key: 'edit',
+              label: '',
+              width: '80px',
+              render: entry => (
+                <ColumnEdit onClick={() => setEditing(entry)}>
+                  {translate('Editar')}
+                </ColumnEdit>
+              ),
+            },
+          ]}
+          dataTable={dataTable}
+        />
+      </Container>
+      {editing && (
+        <Overlay>
+          <EditRepoTag
+            id={editing?.id}
+            value={tag}
+            onCancel={() => setEditing(null)}
+            onSuccess={setTag}
+          />
+        </Overlay>
+      )}
+    </>
   )
 }

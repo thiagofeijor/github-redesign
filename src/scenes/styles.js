@@ -11,6 +11,7 @@ const GlobalStyles = createGlobalStyle`
     max-height: 100%;
     margin: 0px;
     padding: 0px;
+    background: rgb(239, 242, 247);
   }
 
   body {
@@ -24,13 +25,6 @@ const GlobalStyles = createGlobalStyle`
     overflow: hidden;
   }
 
-  pre {
-    font-size: 14px;
-    font-family: 'Nunito', 'Adobe Blank', 'sans-serif';
-    line-height: 1.5;
-    margin: 0;
-  }
-
   a, a:visited, a:active {
     color: inherit;
     text-decoration: none;
@@ -41,16 +35,14 @@ const GlobalStyles = createGlobalStyle`
     min-width: 0;
   }
 
-  input:-webkit-autofill,
-  input:-webkit-autofill:hover,
-  input:-webkit-autofill:focus,
-  input:-webkit-autofill:active {
-    transition: color 9999s ease-out, background-color 9999s ease-out;
-    transition-delay: 9999s;
-  }
-
   h1, h2, h3, h4, h5, h6 {
     font-weight: 400;
+  }
+
+  @media only screen and (max-width: 400px) {
+    body {
+      font-size: 8px;
+    }
   }
 `
 export default GlobalStyles

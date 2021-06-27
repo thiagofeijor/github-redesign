@@ -1,39 +1,63 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
+import debounce from 'lodash/debounce'
 import { useHistory } from 'react-router-dom'
-import AsyncSelect from 'react-select/async'
-import requests from 'services/requests'
-import { debounce } from 'services/functions'
-import { ContentSelect } from './components'
+import { getUsers } from 'services/requests'
+import { useTranslate } from 'services/translate'
+import { Input, Button, Content, Logo } from 'components'
+import { Container } from './components'
 
 export default ({}) => {
   const history = useHistory()
+  const translate = useTranslate()
 
-  const onNavigateToUser = ({ value }) => {
-    history.push(`/repositories/${value}`)
+  const [inputValue, setInputValue] = useState(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [dataList, setDataList] = useState([])
+
+  const onNavigateToUser = user_name => {
+    history.push(`/repositories/${user_name}`)
   }
 
-  const fetchOptions = async (inputValue, callback) => {
-    if (!inputValue) return callback([])
+  const loadOptions = debounce(({ value }) => setInputValue(value), 500)
 
-    const data = await requests.getUsers(inputValue)
-    const options = (data.items || [])
-      .map(({ login }) => ({
-        label: login,
-        value: login,
-      }))
+  useEffect(() => {
+    if (!inputValue) {
+      setDataList([])
+      return
+    }
 
-    callback(options)
-  }
-
-  const loadOptions = debounce(fetchOptions, 800)
+    setIsLoading(true)
+    getUsers(inputValue)
+      .then(response => {
+        setDataList((response.items || []).map(({ login }) => login))
+      })
+      .finally(() => setIsLoading(false))
+  }, [inputValue])
 
   return (
-    <ContentSelect>
-      <AsyncSelect
-        cacheOptions
-        loadOptions={loadOptions}
-        onChange={onNavigateToUser}
-      />
-    </ContentSelect>
+    <>
+      <Logo />
+      <Container>
+        <Content>
+          <Input
+            list="users"
+            onChange={({ target }) => loadOptions(target)}
+            onEnter={onNavigateToUser}
+            isLoading={isLoading}
+          />
+          <Button
+            onClick={() => onNavigateToUser(inputValue)}
+            disabled={!inputValue}
+          >
+            {translate('Buscar')}
+          </Button>
+        </Content>
+      </Container>
+      <datalist id="users" data-testid="list-users">
+        {dataList.map((value, index) => (
+          <option value={value} key={index} />
+        ))}
+      </datalist>
+    </>
   )
 }

@@ -1,9 +1,34 @@
 import '@testing-library/jest-dom/extend-expect'
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor, fireEvent } from '@testing-library/react'
+import { TranslateProvider } from 'components'
 import App from './'
 
-test('renders learn react link', () => {
-  render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
-});
+beforeEach(() => {
+  render(
+    <TranslateProvider>
+      <App />
+    </TranslateProvider>
+  )
+})
+
+test('renders input and button', () => {
+  const inputElement = screen.getByPlaceholderText('Pesquisar')
+  expect(inputElement).toBeInTheDocument()
+  
+  const buttonElement = screen.getByText('Buscar')
+  expect(buttonElement).toBeInTheDocument()
+  expect(buttonElement).toBeDisabled()
+})
+
+test('renders datalist', () => {
+  const datalistElement = screen.getByTestId('list-users')
+  expect(datalistElement).toBeInTheDocument()
+})
+
+test('enable search after type', async () => {
+  fireEvent.change(screen.getByPlaceholderText('Pesquisar'), { target: { value: 'thiagofeijor' } })
+
+  expect(screen.getByPlaceholderText('Pesquisar')).toHaveValue('thiagofeijor')
+
+  await waitFor(() => expect(screen.getByText('Buscar')).not.toBeDisabled(), { timeout: 650 })
+})

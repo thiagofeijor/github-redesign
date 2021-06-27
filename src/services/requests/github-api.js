@@ -1,7 +1,7 @@
 import { Octokit } from '@octokit/rest'
 
 const octokit = new Octokit({
-  auth: process.env.POI_APP_GITHUB_TOKEN
+  auth: process.env.GITHUB_TOKEN
 })
 
 export const getUsers = async q => {
@@ -11,18 +11,11 @@ export const getUsers = async q => {
   return data
 }
 
-export const getRepositories = async username => {
-  const { data } = await octokit.rest.repos.listForUser({
+export const getRepositories = async (username, page = 1) => {
+  const { data } = await octokit.rest.activity.listReposStarredByUser({
     username,
-    per_page: 100, 
-  })
-  return data
-}
-
-export const getLanguages = async (owner, repo ) => {
-  const { data } = await octokit.rest.repos.listLanguages({
-    owner,
-    repo, 
+    page,
+    per_page: 100,
   })
   return data
 }

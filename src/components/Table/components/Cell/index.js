@@ -5,6 +5,13 @@ const Cell = styled.div`
   overflow-x: hidden;
   overflow-y: overlay;
   display: flex;
+  word-break: break-word;
+  :first-child {
+    padding-left: 8px;
+  }
+  :last-child {
+    padding-right: 25px;
+  }
 `
 
 export default Cell

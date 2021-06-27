@@ -4,7 +4,7 @@ const Row = styled.div`
   display: flex;
   align-items: center;
   :nth-child(odd) {
-    background-color: lightgray;
+    background-color: #e1e4e8;
   }
 `
 

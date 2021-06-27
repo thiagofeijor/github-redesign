@@ -1,6 +1,6 @@
 # github-redesign
 
-Define a value to `POI_APP_GITHUB_TOKEN` environment.
+Define a value to `GITHUB_TOKEN` environment.
 
 ## Project Scripts
 
@@ -14,7 +14,7 @@ Start a dev server to preview your app.
 
 ### `yarn build`
 
-Build app for production to `./dist` folder.
+Build app for production to `./build` folder.
 
 ### `yarn test`
 

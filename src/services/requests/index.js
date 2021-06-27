@@ -1,10 +1,12 @@
-import * as githubApi from './github-api'
+import * as github from './github-api'
 
-const getApi = () => {
-  switch (process.env.POI_APP_MIDDLEWARE) {
-    default:
-      return githubApi
-  }
+const moduleExport = {}
+
+switch (process.env.API_KIND) {
+  default:
+    moduleExport.getRepositories = github.getRepositories
+    moduleExport.getUsers = github.getUsers
 }
 
-export default getApi()
+export const getRepositories = moduleExport.getRepositories
+export const getUsers = moduleExport.getUsers
